@@ -6,6 +6,7 @@ import { LoggerServiceDb } from './logger/services/logger.service.db';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { QueueService } from './queue/queue.service';
 
 // 1. Load .env file manually first (as backup)
 const envPath = path.resolve(__dirname, '../.env');
@@ -28,6 +29,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   console.log('Running the application on port 3000');
+
+  const queueService = app.get(QueueService);
+  await queueService.onModuleInit(); // 🛠️ Ensures channel is ready
 
   await app.listen(3000);
   logger.log('Application run successfully');

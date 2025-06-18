@@ -11,6 +11,7 @@ import { NotificationFactory } from './application/factories/notification.factor
 import { EmailNotificationStrategy } from './application/strategies/email-notification.strategy';
 import { SMSNotificationStrategy } from './application/strategies/sms-notification.strategy';
 import { LoggerModule } from '../logger/logger.module';
+import { QueueService } from '../queue/queue.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { LoggerModule } from '../logger/logger.module';
       provide: 'IWebhookRepository',
       useClass: WebhookRepository,
     },
+    QueueService, // Ensure QueueService is available for strategies
     NotificationFactory,
     EmailNotificationStrategy,
     SMSNotificationStrategy,

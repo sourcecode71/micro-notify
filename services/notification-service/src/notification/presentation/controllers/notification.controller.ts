@@ -31,6 +31,7 @@ import { INotificationRepository } from '../../domain/interfaces/notification-re
 import { LoggerServiceFile } from '../../../logger/services/logger.service.file';
 import { LoggerServiceDb } from '../../../logger/services/logger.service.db';
 import { JoiValidationPipe } from '../../../config/validation/joi-validation.pipe';
+import { QueueService } from '../../../queue/queue.service';
 import * as Joi from 'joi';
 
 class BulkNotificationDto {
@@ -50,7 +51,13 @@ export class NotificationController {
     private readonly notificationRepository: INotificationRepository,
     private readonly logger: LoggerServiceFile,
     private readonly loggerDb: LoggerServiceDb,
-  ) {}
+    private readonly queueService: QueueService,
+  ) {
+    console.log(
+      'NotificationController initialized with QueueService:',
+      this.queueService,
+    );
+  }
 
   @Post()
   @HttpCode(HttpStatus.NO_CONTENT)
