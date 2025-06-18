@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  docker-rabbit:
+    build:
+      context: .
+      dockerfile: Dockerfile.Dockerfile  # Custom Dockerfile
+    container_name: docker-rabbit
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+    networks:
+      - notify-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - notify-net
+
+networks:
+  notify-net:
