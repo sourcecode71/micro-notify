@@ -1,4 +1,4 @@
-name: Run Jest and Publish Test Report
+name: Test All Microservices
 
 on:
   push:
@@ -7,35 +7,34 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  test-all:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services  # 👈 Set working directory to your backend
+
+    strategy:
+      matrix:
+        service:
+          - services/notification-service
+          - services/workers/email-worker
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install Dependencies
+      - name: Install dependencies for ${{ matrix.service }}
+        working-directory: ${{ matrix.service }}
         run: npm ci
 
-      - name: Run Jest Tests
-        run: npm run test
+      - name: Run tests for ${{ matrix.service }}
+        working-directory: ${{ matrix.service }}
+        run: npm test
 
-      - name: Upload Test Report
+      - name: Upload test report (if any)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: jest-stare-report
-          path: services/jest-stare/  # Adjust if your test reports go elsewhere
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: services/jest-stare
-          force_orphan: true
+          name: ${{ matrix.service }}-test-report
+          path: ${{ matrix.service }}/jest-stare/
