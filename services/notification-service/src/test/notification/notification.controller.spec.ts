@@ -6,6 +6,7 @@ import { LoggerServiceFile } from '../../../src/logger/services/logger.service.f
 import { LoggerServiceDb } from '../../../src/logger/services/logger.service.db';
 import { SendNotificationDto } from '../../../src/notification/presentation/dtos/send-notification.dto';
 import { Notification } from '../../../src/notification/domain/entities/notification.entity';
+import { QueueService } from 'src/queue/queue.service';
 import {
   NotificationChannel,
   NotificationType,
@@ -71,6 +72,13 @@ describe('NotificationController', () => {
           useValue: {
             log: jest.fn(),
             error: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: QueueService,
+          useValue: {
+            add: jest.fn(),
+            process: jest.fn(),
           },
         },
       ],
