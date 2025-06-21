@@ -1,0 +1,47 @@
+name: Run Jest and Publish Test Reports
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - services/notification-service
+          - services/workers/email-worker
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.service }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest Tests
+        run: npm run test
+
+      - name: Prepare artifact name
+        id: artifact
+        run: echo "safe_name=${{ matrix.service }}" | sed 's|/|-|g' >> $GITHUB_ENV
+
+      - name: Upload Jest test report (jest-stare)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.safe_name }}-test-report
+          path: ${{ matrix.service }}/jest-stare/
